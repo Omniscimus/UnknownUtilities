@@ -1,6 +1,8 @@
 package net.omniscimus.unknownutilities;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -8,6 +10,8 @@ import org.bukkit.configuration.file.FileConfiguration;
  * Contains configuration information.
  */
 public class Settings {
+
+    private static final Logger logger = Logger.getLogger(Settings.class.getName());
 
     private final transient UnknownUtilities plugin;
     private transient FileConfiguration config;
@@ -43,9 +47,28 @@ public class Settings {
 	modules.getKeys(false).stream()
 		.filter((module) -> (modules.getBoolean(module + ".enabled", false)))
 		.forEach((module) -> {
-		    enabledModules.add(UnknownUtilities.MODULES.get(module));
+		    Class<? extends UnknownUtility> clazz = UnknownUtilities.getModuleClass(module);
+		    if (clazz != null) {
+			enabledModules.add(clazz);
+		    } else {
+			logger.log(Level.WARNING, "Did not recognize enabled module in config.yml: {0}", module);
+		    }
 		});
 	return enabledModules;
+    }
+
+    /**
+     * Gets the ConfigurationSection containing the settings for a specific
+     * module.
+     *
+     * @param module the module whose settings should be looked up
+     * @return the requested ConfigurationSection, or null if it couldn't be
+     * found
+     */
+    public ConfigurationSection getModuleSettings(UnknownUtility module) {
+	String moduleName = UnknownUtilities.getModuleName(module.getClass());
+	String path = "modules." + moduleName + ".settings";
+	return config.getConfigurationSection(path);
     }
 
 }

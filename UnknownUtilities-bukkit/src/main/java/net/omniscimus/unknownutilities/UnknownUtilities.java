@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.omniscimus.unknownutilities.utilities.ScheduledCommandsUtility;
@@ -19,13 +20,14 @@ public class UnknownUtilities extends JavaPlugin {
 
     private static UnknownUtilities inst;
     private transient Settings settings;
-    private static final ArrayList<UnknownUtility> enabledModules = new ArrayList<>();
-    public static final Map<String, Class<? extends UnknownUtility>> MODULES;
+    private final ArrayList<UnknownUtility> enabledModules = new ArrayList<>();
+    private static final Map<String, Class<? extends UnknownUtility>> MODULES;
 
     static {
 	HashMap<String, Class<? extends UnknownUtility>> map = new HashMap<>();
 	// Add all possible modules here
 	map.put("scheduledcommands", ScheduledCommandsUtility.class);
+
 	MODULES = Collections.unmodifiableMap(map);
     }
 
@@ -65,12 +67,39 @@ public class UnknownUtilities extends JavaPlugin {
     }
 
     /**
-     * Gets a module by its class.
+     * Gets a module's class by its name.
+     *
+     * @param name the name of the module
+     * @return the class of the module, or null if there's no module with that
+     * name
+     */
+    public static Class<? extends UnknownUtility> getModuleClass(String name) {
+	return MODULES.get(name);
+    }
+
+    /**
+     * Gets a module's name by its class.
+     *
+     * @param clazz the class of the module whose name should be given
+     * @return the name of the module, or null if the given module isn't
+     * registered
+     */
+    public static String getModuleName(Class<? extends UnknownUtility> clazz) {
+	for (Entry<String, Class<? extends UnknownUtility>> entry : MODULES.entrySet()) {
+	    if (clazz.equals(entry.getValue())) {
+		return entry.getKey();
+	    }
+	}
+	return null;
+    }
+
+    /**
+     * Gets an enabled module by its class.
      *
      * @param clazz the module's class
      * @return the module, if it is enabled; otherwise null
      */
-    public UnknownUtility getModule(Class<? extends UnknownUtility> clazz) {
+    public UnknownUtility getEnabledModule(Class<? extends UnknownUtility> clazz) {
 	for (UnknownUtility module : enabledModules) {
 	    if (module.getClass().equals(clazz)) {
 		return module;
@@ -100,7 +129,7 @@ public class UnknownUtilities extends JavaPlugin {
      * @param module the class of the module to disable
      */
     public void disableModule(Class<? extends UnknownUtility> module) {
-	UnknownUtility toDisable = getModule(module);
+	UnknownUtility toDisable = getEnabledModule(module);
 	toDisable.disable();
 	enabledModules.remove(toDisable);
     }

@@ -4,7 +4,7 @@ package net.omniscimus.unknownutilities;
  * Represents a module of this plugin, containing some functionality.
  */
 public abstract class UnknownUtility {
-    
+
     /**
      * Enables this module.
      */
