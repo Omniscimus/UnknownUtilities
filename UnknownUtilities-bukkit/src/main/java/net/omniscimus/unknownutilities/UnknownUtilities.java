@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.omniscimus.unknownutilities.utilities.ScheduledCommandsUtility;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -24,6 +25,7 @@ public class UnknownUtilities extends JavaPlugin {
     static {
 	HashMap<String, Class<? extends UnknownUtility>> map = new HashMap<>();
 	// Add all possible modules here
+	map.put("scheduledcommands", ScheduledCommandsUtility.class);
 	MODULES = Collections.unmodifiableMap(map);
     }
 
