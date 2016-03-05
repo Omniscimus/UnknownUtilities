@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>net.omniscimus.unknownutilities</groupId>
+  <artifactId>UnknownUtilities</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>UnknownUtilities-bukkit</module>
+    <module>UnknownUtilities-sponge</module>
+  </modules>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <ghUser>Omniscimus</ghUser>
+    <ghRepo>UnknownUtilities</ghRepo>
+    <ghProject>${ghUser}/${ghRepo}</ghProject>
+  </properties>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.3</version>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <name>${project.artifactId}</name>
+  <description>
+    Minecraft plugin that handles some things for the server The Unknown.
+  </description>
+  <url>https://github.com/${ghProject}</url>
+  <inceptionYear>2014</inceptionYear>
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>https://opensource.org/licenses/MIT</url>
+    </license>
+  </licenses>
+  <organization>
+    <name>The Unknown</name>
+    <url>http://the-unknown.com</url>
+  </organization>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/${ghProject}/issues</url>
+  </issueManagement>
+  <scm>
+    <connection>scm:git:https://github.com/${ghProject}.git</connection>
+    <developerConnection>scm:git:https://github.com/${ghProject}.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/${ghProject}</url>
+  </scm>
+  <prerequisites>
+    <maven>3.0.3</maven>
+  </prerequisites>
+
+</project>

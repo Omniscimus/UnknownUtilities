@@ -1,0 +1,6 @@
+name: ${pom.artifactId}
+version: ${pom.version}
+description: This plugin provides some useful features for The Unknown.
+
+main: net.omniscimus.unknownutilities.UnknownUtilities
+database: false
