@@ -1,0 +1,6 @@
+modules:
+    some-module:
+        enabled: false
+        settings:
+            key: 'value'
+            another-key: 2314
