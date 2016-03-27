@@ -1,4 +1,4 @@
-name: ${pom.artifactId}
+name: ${pom.parent.artifactId}
 version: ${pom.version}
 description: This plugin provides some useful features for The Unknown.
 

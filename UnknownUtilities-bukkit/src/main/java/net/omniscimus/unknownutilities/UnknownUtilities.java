@@ -1,5 +1,7 @@
 package net.omniscimus.unknownutilities;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,11 +58,14 @@ public class UnknownUtilities extends JavaPlugin {
     public void onEnable() {
 	inst = this;
 
+	settings = new Settings(this);
 	settings.getEnabledModules().stream().forEach((module) -> {
 	    try {
-		module.newInstance().enable();
+		enableModule(module);
 		logger.log(Level.INFO, "Enabled module: {0}", module.getSimpleName());
-	    } catch (InstantiationException | IllegalAccessException ex) {
+	    } catch (InstantiationException | IllegalAccessException |
+		    NoSuchMethodException | SecurityException |
+		    IllegalArgumentException | InvocationTargetException ex) {
 		logger.log(Level.WARNING, "Failed to enable module: " + module.getSimpleName(), ex);
 	    }
 	});
@@ -112,13 +117,24 @@ public class UnknownUtilities extends JavaPlugin {
      * Enables the specified module.
      *
      * @param module the module to enable
-     * @throws InstantiationException @see Class#newInstance()
-     * @throws IllegalAccessException @see Class#newInstance()
+     * @throws InstantiationException if the module can't be instantiated
+     * @throws IllegalAccessException if the module can't be instantiated
+     * @throws NoSuchMethodException if the module can't be instantiated
+     * @throws InvocationTargetException if the module can't be instantiated
      */
     public void enableModule(Class<? extends UnknownUtility> module)
-	    throws InstantiationException, IllegalAccessException {
+	    throws InstantiationException, IllegalAccessException,
+	    NoSuchMethodException, IllegalArgumentException,
+	    InvocationTargetException {
 
-	UnknownUtility instance = module.newInstance();
+	//System.out.println("Module: " + module);
+	//System.out.println("This: " + this.getClass());
+	/*for (Constructor c : module.getDeclaredConstructors()) {
+	    System.out.println(c);
+	}*/
+	//System.out.println("Constructor: " + module.getDeclaredConstructor(UnknownUtilities.class));
+	//System.out.println("New instance: " + module.getDeclaredConstructor(UnknownUtilities.class).newInstance(this));
+	UnknownUtility instance = module.getDeclaredConstructor(UnknownUtilities.class).newInstance(this);
 	instance.enable();
 	enabledModules.add(instance);
     }
@@ -138,11 +154,15 @@ public class UnknownUtilities extends JavaPlugin {
      * Reloads the specified module.
      *
      * @param module the module to reload
-     * @throws InstantiationException @see Class#newInstance()
-     * @throws IllegalAccessException @see Class#newInstance()
+     * @throws InstantiationException if the module can't be instantiated
+     * @throws IllegalAccessException if the module can't be instantiated
+     * @throws NoSuchMethodException if the module can't be instantiated
+     * @throws InvocationTargetException if the module can't be instantiated
      */
     public void reloadModule(Class<? extends UnknownUtility> module)
-	    throws InstantiationException, IllegalAccessException {
+	    throws InstantiationException, IllegalAccessException,
+	    NoSuchMethodException, IllegalArgumentException,
+	    InvocationTargetException {
 	disableModule(module);
 	enableModule(module);
     }

@@ -1,6 +1,28 @@
 modules:
     scheduledcommands:
+        #TODO timezone
         enabled: false
         settings:
-            key: 'value'
-            another-key: 2314
+            # ScheduledCommands allows you to schedule certain commands to run
+            # at specific times and on specific intervals. Configuration is
+            # similar to cron.
+            # Note that the number of spaces does not matter, as long as they
+            # separate the values:
+            # " 0  1 24  *  *    * reload" is equivalent to "0 1 24 * * * reload"
+            month-based:
+                # second | minute | hour (0-23) | day of month | month of year | year
+                # Examples:
+                #- ' 0  1 24  *  *    * reload'           # will issue the '/reload' command every day at 1 minute past midnight
+                #- ' 0  *  *  *  *    * kickall'          # will issue the '/kickall' command every minute
+                #- ' *  *  *  *  *    * broadcast hello'  # will issue the '/broadcast hello' command every second
+                #- ' 0  0 13 31 12    * fireworks'        # will issue the 'fireworks' command every year at December 31st at 1 PM
+                #- '30 45  8 15  2 2031 say hello future' # will issue the '/say hello future' command 30 seconds past a quarter to 8 AM at February 15th in the year 2031
+                #-  '0  0  0  1  1 2017 say hello 2017'   # will issue the '/say hello 2017' command at midnight on New Year's Day 2017, or will do nothing if that's in the past
+            week-based:
+                # second | minute | hour (0-23) | day of week | week of year | year
+                # Week number range is 1 to 53. Weeks start on Monday. Day of
+                # week number range is from 1 to 7.
+                # Examples:
+                #- ' 0  0  0 7  *    * help'     # will issue the '/help' command every Saturday
+                #- ' 0  0 17 3 13    * version'  # will issue the '/version' command every year on the Tuesday in week 13 at 5 PM
+                #- ' 0 15  7 5  2 2020 list'     # will issue the '/list' command on Thursday in week 2 of 2020, which is 9 January
