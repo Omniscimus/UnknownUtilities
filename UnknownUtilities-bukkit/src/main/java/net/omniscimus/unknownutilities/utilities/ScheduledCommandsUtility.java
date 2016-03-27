@@ -260,6 +260,49 @@ abstract class ScheduledCommand {
      */
     protected abstract String getTime();
 
+    /**
+     * Calculates the date of first execution and the time between executions,
+     * then creates a Trigger with those values.
+     *
+     * @param dateFormat a string for SimpleDateFormat containing the formatting
+     * of the date
+     * @param dateString a string containing the date, following the specified
+     * format
+     * @param interval the number of seconds that should be in between each
+     * execution
+     * @return the created trigger
+     * @throws ParseException if the date could not be parsed
+     */
+    Trigger createTrigger(String dateFormat, String dateString, int interval) throws ParseException {
+	SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+	Date date = sdf.parse(dateString);
+
+	CalendarIntervalScheduleBuilder cisb = calendarIntervalSchedule()
+		.withIntervalInSeconds(interval)
+		.withMisfireHandlingInstructionDoNothing();
+	if (interval != 0) {
+	    cisb.withIntervalInSeconds(interval);
+	}
+	return newTrigger()
+		.withSchedule(cisb)
+		.startAt(date)
+		.build();
+    }
+
+    /**
+     * Returns value, if i is not 0; returns i otherwise
+     *
+     * @param i the int to return if it is not 0
+     * @param value the int to return if i is 0
+     */
+    int setIntOnce(int i, int value) {
+	if (i == 0) {
+	    return value;
+	} else {
+	    return i;
+	}
+    }
+
 }
 
 /**
@@ -303,15 +346,16 @@ class ScheduledWeekCommand extends ScheduledCommand {
 		+ time[5];
     }
 
-    /**
-     * Calculates the date of first execution and the time between executions,
-     * then creates a Trigger with those values.
-     *
-     * @return the created trigger
-     * @throws ParseException if the date could not be parsed
-     */
-    private Trigger createTrigger() throws ParseException {
-	SimpleDateFormat sdf = new SimpleDateFormat("ss:mm:HH:u:ww:yyyy");
+    @Override
+    public void schedule(Scheduler scheduler) throws SchedulerException {
+	HashMap<String, String> dataMap = new HashMap<>();
+	dataMap.put("command", this.command);
+
+	JobDetail job = newJob(CommandJob.class)
+		.setJobData(new JobDataMap(dataMap))
+		.withDescription(this.toString())
+		.build();
+
 	StringBuilder dateStringBuilder = new StringBuilder();
 	int repeatInSeconds = 0;
 
@@ -326,31 +370,9 @@ class ScheduledWeekCommand extends ScheduledCommand {
 		}
 	    }
 	}
-	Date date = sdf.parse(dateStringBuilder.toString());
-
-	CalendarIntervalScheduleBuilder cisb = calendarIntervalSchedule()
-		.withIntervalInSeconds(repeatInSeconds)
-		.withMisfireHandlingInstructionDoNothing();
-	if (repeatInSeconds != 0) {
-	    cisb.withIntervalInSeconds(repeatInSeconds);
-	}
-	return newTrigger()
-		.withSchedule(cisb)
-		.startAt(date)
-		.build();
-    }
-
-    @Override
-    public void schedule(Scheduler scheduler) throws SchedulerException {
-	HashMap<String, String> dataMap = new HashMap<>();
-	dataMap.put("command", this.command);
-
-	JobDetail job = newJob(CommandJob.class)
-		.setJobData(new JobDataMap(dataMap))
-		.withDescription(this.toString())
-		.build();
+	String dateString = dateStringBuilder.toString();
 	try {
-	    Trigger trigger = createTrigger();
+	    Trigger trigger = createTrigger("ss:mm:HH:u:ww:yyyy", dateString, repeatInSeconds);
 	    scheduler.scheduleJob(job, trigger);
 	} catch (ParseException ex) {
 	    logger.log(Level.WARNING, "Could not parse generated date", ex);
@@ -395,18 +417,117 @@ class ScheduledWeekCommand extends ScheduledCommand {
 	return repeatInSeconds;
     }
 
+}
+
+/**
+ * Represents a command scheduled to execute on times formatted with weeks in
+ * mind.
+ */
+class ScheduledMonthCommand extends ScheduledCommand {
+
+    private static final Logger logger = Logger.getLogger(ScheduledWeekCommand.class.getName());
+
+    private final int[] time;
+
     /**
-     * Returns value, if i is not 0; returns i otherwise
+     * Creates the object.
      *
-     * @param i the int to return if it is not 0
-     * @param value the int to return if i is 0
+     * @param command the command that should be executed
+     * @param second the second of the minute on which the command should be
+     * executed
+     * @param minute the minute of the hour on which the command should be
+     * executed
+     * @param hour the hour of the day on which the command should be executed,
+     * ranging from 0 to 23
+     * @param day the day of the week, starting at 1 for Monday, on which the
+     * command should be executed
+     * @param month The month of the year in which this command should be
+     * executed, ranging from 1 to 12
+     * @param year the year in which this command should execute. Note that this
+     * will break in the year 2147483648 due to the limitations to an Integer
      */
-    private int setIntOnce(int i, int value) {
-	if (i == 0) {
-	    return value;
-	} else {
-	    return i;
+    protected ScheduledMonthCommand(String command, int second, int minute,
+	    int hour, int day, int month, int year) {
+
+	super(command);
+	time = new int[]{second, minute, hour, day, month, year};
+    }
+
+    @Override
+    public String getTime() {
+	return time[2] + ":" + time[1] + ":" + time[0] + " on day "
+		+ time[3] + " in month " + time[4] + " of "
+		+ time[5];
+    }
+
+    @Override
+    public void schedule(Scheduler scheduler) throws SchedulerException {
+	HashMap<String, String> dataMap = new HashMap<>();
+	dataMap.put("command", this.command);
+
+	JobDetail job = newJob(CommandJob.class)
+		.setJobData(new JobDataMap(dataMap))
+		.withDescription(this.toString())
+		.build();
+
+	StringBuilder dateStringBuilder = new StringBuilder();
+	int repeatInSeconds = 0;
+
+	for (int i = 0; i < time.length; i++) {
+	    if (time[i] == -1) {
+		repeatInSeconds = fillDateString(dateStringBuilder, i);
+		break;
+	    } else {
+		dateStringBuilder.append(time[i]);
+		if (i != time.length - 1) {
+		    dateStringBuilder.append(":");
+		}
+	    }
 	}
+	String dateString = dateStringBuilder.toString();
+	try {
+	    Trigger trigger = createTrigger("ss:mm:HH:u:MM:yyyy", dateString, repeatInSeconds);
+	    scheduler.scheduleJob(job, trigger);
+	} catch (ParseException ex) {
+	    logger.log(Level.WARNING, "Could not parse generated date", ex);
+	}
+    }
+
+    @SuppressWarnings("fallthrough")
+    private int fillDateString(StringBuilder dateBuilder, int progress) {
+	int repeatInSeconds = 0;
+	LocalDateTime now = LocalDateTime.now();
+	switch (progress) {
+	    case 0:
+		repeatInSeconds = setIntOnce(repeatInSeconds, 1);
+		dateBuilder
+			.append(now.get(ChronoField.SECOND_OF_MINUTE))
+			.append(":");
+	    case 1:
+		repeatInSeconds = setIntOnce(repeatInSeconds, 60);
+		dateBuilder
+			.append(now.get(ChronoField.MINUTE_OF_HOUR))
+			.append(":");
+	    case 2:
+		repeatInSeconds = setIntOnce(repeatInSeconds, 60 * 60);
+		dateBuilder
+			.append(now.get(ChronoField.HOUR_OF_DAY))
+			.append(":");
+	    case 3:
+		repeatInSeconds = setIntOnce(repeatInSeconds, 60 * 60 * 24);
+		dateBuilder
+			.append(now.get(ChronoField.DAY_OF_WEEK))
+			.append(":");
+	    case 4:
+		repeatInSeconds = setIntOnce(repeatInSeconds, 60 * 60 * 24);
+		dateBuilder
+			.append(now.get(ChronoField.MONTH_OF_YEAR))
+			.append(":");
+	    case 5:
+		dateBuilder
+			.append(now.get(ChronoField.YEAR));
+	}
+	return repeatInSeconds;
     }
 
 }
