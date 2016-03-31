@@ -15,6 +15,7 @@
       <version>1.9-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
+    <!-- Quartz for ScheduledCommandsUtility -->
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
@@ -26,6 +27,13 @@
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.7.5</version>
       <scope>compile</scope>
+    </dependency>
+    <!-- WorldGuard for WitherUtility -->
+    <dependency>
+      <groupId>com.sk89q</groupId>
+      <artifactId>worldguard</artifactId>
+      <version>6.1.1-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <parent>
@@ -77,6 +85,10 @@
     <repository>
       <id>spigot-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>
+    <repository>
+      <id>sk89q-repo</id>
+      <url>http://maven.sk89q.com/repo/</url>
     </repository>
   </repositories>
 

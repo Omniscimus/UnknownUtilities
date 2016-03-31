@@ -26,3 +26,5 @@ modules:
                 #- ' 0  0  0 7  *    * help'     # will issue the '/help' command every Saturday
                 #- ' 0  0 17 3 13    * version'  # will issue the '/version' command every year on the Tuesday in week 13 at 5 PM
                 #- ' 0 15  7 5  2 2020 list'     # will issue the '/list' command on Thursday in week 2 of 2020, which is 9 January
+    wither:
+        enabled: false

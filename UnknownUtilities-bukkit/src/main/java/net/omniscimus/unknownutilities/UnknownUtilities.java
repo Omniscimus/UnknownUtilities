@@ -1,6 +1,5 @@
 package net.omniscimus.unknownutilities;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.omniscimus.unknownutilities.utilities.ScheduledCommandsUtility;
+import net.omniscimus.unknownutilities.utilities.wither.WitherUtility;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -29,6 +29,7 @@ public class UnknownUtilities extends JavaPlugin {
 	HashMap<String, Class<? extends UnknownUtility>> map = new HashMap<>();
 	// Add all possible modules here
 	map.put("scheduledcommands", ScheduledCommandsUtility.class);
+	map.put("wither", WitherUtility.class);
 
 	MODULES = Collections.unmodifiableMap(map);
     }
@@ -63,9 +64,7 @@ public class UnknownUtilities extends JavaPlugin {
 	    try {
 		enableModule(module);
 		logger.log(Level.INFO, "Enabled module: {0}", module.getSimpleName());
-	    } catch (InstantiationException | IllegalAccessException |
-		    NoSuchMethodException | SecurityException |
-		    IllegalArgumentException | InvocationTargetException ex) {
+	    } catch (ModuleException ex) {
 		logger.log(Level.WARNING, "Failed to enable module: " + module.getSimpleName(), ex);
 	    }
 	});
@@ -117,26 +116,20 @@ public class UnknownUtilities extends JavaPlugin {
      * Enables the specified module.
      *
      * @param module the module to enable
-     * @throws InstantiationException if the module can't be instantiated
-     * @throws IllegalAccessException if the module can't be instantiated
-     * @throws NoSuchMethodException if the module can't be instantiated
-     * @throws InvocationTargetException if the module can't be instantiated
+     * @throws ModuleException if the module couldn't be enabled
      */
     public void enableModule(Class<? extends UnknownUtility> module)
-	    throws InstantiationException, IllegalAccessException,
-	    NoSuchMethodException, IllegalArgumentException,
-	    InvocationTargetException {
-
-	//System.out.println("Module: " + module);
-	//System.out.println("This: " + this.getClass());
-	/*for (Constructor c : module.getDeclaredConstructors()) {
-	    System.out.println(c);
-	}*/
-	//System.out.println("Constructor: " + module.getDeclaredConstructor(UnknownUtilities.class));
-	//System.out.println("New instance: " + module.getDeclaredConstructor(UnknownUtilities.class).newInstance(this));
-	UnknownUtility instance = module.getDeclaredConstructor(UnknownUtilities.class).newInstance(this);
-	instance.enable();
-	enabledModules.add(instance);
+	    throws ModuleException {
+	try {
+	    UnknownUtility instance = module.getDeclaredConstructor(UnknownUtilities.class)
+		    .newInstance(this);
+	    instance.enable();
+	    enabledModules.add(instance);
+	} catch (NoSuchMethodException | SecurityException |
+		InstantiationException | IllegalAccessException |
+		IllegalArgumentException | InvocationTargetException ex) {
+	    throw new ModuleException(ex);
+	}
     }
 
     /**
@@ -154,15 +147,10 @@ public class UnknownUtilities extends JavaPlugin {
      * Reloads the specified module.
      *
      * @param module the module to reload
-     * @throws InstantiationException if the module can't be instantiated
-     * @throws IllegalAccessException if the module can't be instantiated
-     * @throws NoSuchMethodException if the module can't be instantiated
-     * @throws InvocationTargetException if the module can't be instantiated
+     * @throws ModuleException if the module couldn't be re-enabled
      */
     public void reloadModule(Class<? extends UnknownUtility> module)
-	    throws InstantiationException, IllegalAccessException,
-	    NoSuchMethodException, IllegalArgumentException,
-	    InvocationTargetException {
+	    throws ModuleException {
 	disableModule(module);
 	enableModule(module);
     }

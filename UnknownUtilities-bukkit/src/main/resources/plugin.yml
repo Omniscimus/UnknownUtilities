@@ -4,3 +4,4 @@ description: This plugin provides some useful features for The Unknown.
 
 main: net.omniscimus.unknownutilities.UnknownUtilities
 database: false
+softdepend: [WorldGuard]
