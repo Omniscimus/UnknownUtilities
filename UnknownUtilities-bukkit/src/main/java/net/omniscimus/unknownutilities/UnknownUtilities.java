@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.omniscimus.unknownutilities.utilities.NetherTopUtility;
 import net.omniscimus.unknownutilities.utilities.ScheduledCommandsUtility;
 import net.omniscimus.unknownutilities.utilities.wither.WitherUtility;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,6 +31,7 @@ public class UnknownUtilities extends JavaPlugin {
 	// Add all possible modules here
 	map.put("scheduledcommands", ScheduledCommandsUtility.class);
 	map.put("wither", WitherUtility.class);
+	map.put("nethertop", NetherTopUtility.class);
 
 	MODULES = Collections.unmodifiableMap(map);
     }
