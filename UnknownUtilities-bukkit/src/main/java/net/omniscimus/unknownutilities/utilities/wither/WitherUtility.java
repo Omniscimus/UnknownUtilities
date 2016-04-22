@@ -1,7 +1,7 @@
 package net.omniscimus.unknownutilities.utilities.wither;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 import net.omniscimus.universalvotes.UniversalVotes;
 import net.omniscimus.universalvotes.VotesSQL;
@@ -9,6 +9,7 @@ import net.omniscimus.unknownutilities.ModuleException;
 import net.omniscimus.unknownutilities.UnknownUtilities;
 import net.omniscimus.unknownutilities.UnknownUtility;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Wither;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -21,7 +22,8 @@ public class WitherUtility extends UnknownUtility {
     private ArenaManager arenaManager;
     private WitherListener listener;
 
-    private ArrayList<UUID> fightingPlayers;
+    /* Wither's UUID, Player's UUID */
+    private HashMap<UUID, UUID> withers;
 
     /**
      * Constructs the object.
@@ -47,23 +49,13 @@ public class WitherUtility extends UnknownUtility {
     }
 
     /**
-     * Adds a player to the list of players who are currently fighting the
-     * Wither in the arena.
+     * Adds a new wither fight to the memory.
      *
-     * @param player the player who started fighting the wither
+     * @param wither the new wither to register
+     * @param player the player who spawned this wither
      */
-    public void addFightingPlayer(Player player) {
-	fightingPlayers.add(player.getUniqueId());
-    }
-
-    /**
-     * Removes a player from the list of players who are currently fighting the
-     * Wither in the arena.
-     *
-     * @param player the player who stopped fighting the wither
-     */
-    public void removeFightingPlayer(Player player) {
-	fightingPlayers.remove(player.getUniqueId());
+    public void addWither(Wither wither, Player player) {
+	withers.put(wither.getUniqueId(), player.getUniqueId());
     }
 
     /**
@@ -78,7 +70,7 @@ public class WitherUtility extends UnknownUtility {
     @Override
     protected void enable() throws ModuleException {
 
-	fightingPlayers = new ArrayList<>();
+	withers = new HashMap<>();
 
 	/* Find WorldGuard for determining the arena region */
 	Plugin worldGuard = plugin.getServer().getPluginManager().getPlugin("WorldGuard");
