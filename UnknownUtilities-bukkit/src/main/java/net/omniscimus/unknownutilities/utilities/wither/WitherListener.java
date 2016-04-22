@@ -1,6 +1,10 @@
 package net.omniscimus.unknownutilities.utilities.wither;
 
+import java.sql.SQLException;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.bukkit.ChatColor;
 import org.bukkit.SkullType;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Skull;
@@ -43,7 +47,25 @@ public class WitherListener implements Listener {
 		    .isInWitherArena(event.getLocation());
 	    if (!inWitherArena) {
 		event.setCancelled(true);
+		return;
 	    }
+
+	    /* Try to remove vote points from the player who spawned it */
+	    try {
+		if (!witherUtility.getVotesDatabase().removeVotes(lastWitherSkullPlacer, 20)) {
+		    event.setCancelled(true);
+		    return;
+		}
+	    } catch (SQLException | ClassNotFoundException ex) {
+		event.setCancelled(true);
+		witherUtility.getPlugin().getServer().getPlayer(lastWitherSkullPlacer).sendMessage("You need 20 vote points to spawn the wither.");
+		Logger.getLogger(WitherListener.class.getName())
+			.log(Level.WARNING, "Could not remove votes from player: " + lastWitherSkullPlacer + " due to an SQL error.", ex);
+		return;
+	    }
+	    
+	    witherUtility.getPlugin().getServer().getPlayer(lastWitherSkullPlacer)
+		    .sendMessage(ChatColor.GOLD + "You just successfully spawned the wither! Good luck!");
 	}
     }
 

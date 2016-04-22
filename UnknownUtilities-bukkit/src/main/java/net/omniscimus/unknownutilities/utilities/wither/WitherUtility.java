@@ -3,6 +3,8 @@ package net.omniscimus.unknownutilities.utilities.wither;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import java.util.ArrayList;
 import java.util.UUID;
+import net.omniscimus.universalvotes.UniversalVotes;
+import net.omniscimus.universalvotes.VotesSQL;
 import net.omniscimus.unknownutilities.ModuleException;
 import net.omniscimus.unknownutilities.UnknownUtilities;
 import net.omniscimus.unknownutilities.UnknownUtility;
@@ -29,6 +31,20 @@ public class WitherUtility extends UnknownUtility {
     public WitherUtility(UnknownUtilities plugin) {
 	this.plugin = plugin;
     }
+    
+    /**
+     * Gets the plugin where this utility originates from.
+     * 
+     * @return UnknownUtilities instance
+     */
+    public UnknownUtilities getPlugin() {
+	return plugin;
+    }
+
+    public VotesSQL getVotesDatabase() {
+	return ((UniversalVotes) plugin.getServer().getPluginManager().getPlugin("UniversalVotes"))
+		.getVotesDatabase();
+    }
 
     /**
      * Adds a player to the list of players who are currently fighting the
@@ -39,7 +55,7 @@ public class WitherUtility extends UnknownUtility {
     public void addFightingPlayer(Player player) {
 	fightingPlayers.add(player.getUniqueId());
     }
-    
+
     /**
      * Removes a player from the list of players who are currently fighting the
      * Wither in the arena.
