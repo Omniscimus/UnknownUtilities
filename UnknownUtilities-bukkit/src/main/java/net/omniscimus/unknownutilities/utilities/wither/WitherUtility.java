@@ -8,6 +8,7 @@ import net.omniscimus.universalvotes.VotesSQL;
 import net.omniscimus.unknownutilities.ModuleException;
 import net.omniscimus.unknownutilities.UnknownUtilities;
 import net.omniscimus.unknownutilities.UnknownUtility;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wither;
 import org.bukkit.plugin.Plugin;
@@ -33,10 +34,10 @@ public class WitherUtility extends UnknownUtility {
     public WitherUtility(UnknownUtilities plugin) {
 	this.plugin = plugin;
     }
-    
+
     /**
      * Gets the plugin where this utility originates from.
-     * 
+     *
      * @return UnknownUtilities instance
      */
     public UnknownUtilities getPlugin() {
@@ -54,8 +55,27 @@ public class WitherUtility extends UnknownUtility {
      * @param wither the new wither to register
      * @param player the player who spawned this wither
      */
-    public void addWither(Wither wither, Player player) {
+    public void registerWitherFight(Wither wither, Player player) {
 	withers.put(wither.getUniqueId(), player.getUniqueId());
+    }
+
+    /**
+     * Gets the player who spawned a wither.
+     *
+     * @param wither the wither whose spawner should be given
+     * @return the spawner, or null if that player couldn't be found or if that
+     * player is not online anymore
+     */
+    public Player getWitherSpawner(Wither wither) {
+	UUID playerSpawner = withers.get(wither.getUniqueId());
+	if (playerSpawner == null) {
+	    return null;
+	}
+	OfflinePlayer player = plugin.getServer().getOfflinePlayer(playerSpawner);
+	if (player == null) {
+	    return null;
+	}
+	return player.getPlayer();
     }
 
     /**
