@@ -131,7 +131,9 @@ public class WitherListener implements Listener {
 	playerSpawner.giveExp(50);
 	giveNetherStar(playerSpawner);
 
-	// TODO reset the arena
+	witherUtility.getArenaManager().resetArena();
+
+	// TODO command for setting the arena's schematic paste location
 	// TODO teleport away the player to avoid suffocation when resetting the arena
 	// TODO do only permit one wither fight at a time
 	// TODO unregister the wither fight

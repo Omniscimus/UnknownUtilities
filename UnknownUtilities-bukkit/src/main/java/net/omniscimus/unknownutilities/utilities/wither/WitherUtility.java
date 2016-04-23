@@ -1,5 +1,6 @@
 package net.omniscimus.unknownutilities.utilities.wither;
 
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import java.util.HashMap;
 import java.util.UUID;
@@ -92,12 +93,16 @@ public class WitherUtility extends UnknownUtility {
 
 	withers = new HashMap<>();
 
-	/* Find WorldGuard for determining the arena region */
+	/* Find WorldGuard and WorldEdit for determining the arena region */
 	Plugin worldGuard = plugin.getServer().getPluginManager().getPlugin("WorldGuard");
 	if (!(worldGuard instanceof WorldGuardPlugin)) {
 	    throw new ModuleException("Couldn't find a compatible version of WorldGuard. WitherUtility could not be enabled.");
 	}
-	arenaManager = new ArenaManager((WorldGuardPlugin) worldGuard);
+	Plugin worldEdit = plugin.getServer().getPluginManager().getPlugin("WorldEdit");
+	if (!(worldEdit instanceof WorldEditPlugin)) {
+	    throw new ModuleException("Couldn't find a compatible version of WorldEdit. WitherUtility could not be enabled.");
+	}
+	arenaManager = new ArenaManager(this, (WorldEditPlugin) worldEdit, (WorldGuardPlugin) worldGuard);
 
 	listener = new WitherListener(this);
 	plugin.getServer().getPluginManager().registerEvents(listener, plugin);

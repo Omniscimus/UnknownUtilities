@@ -28,5 +28,10 @@ modules:
                 #- ' 0 15  7 5  2 2020 list'     # will issue the '/list' command on Thursday in week 2 of 2020, which is 9 January
     wither:
         enabled: false
+        settings:
+            # The schematic to paste for arena resets
+            schematic: 'witherArena'
+            # The location for the WorldEdit paste. Set this setting using commands.
+            location:
     nethertop:
         enabled: false
